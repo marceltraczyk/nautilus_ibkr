@@ -1,21 +1,20 @@
 import os
-from dotenv import load_dotenv
 
+from dotenv import load_dotenv
+from nautilus_trader.adapters.interactive_brokers.common import IB
 from nautilus_trader.adapters.interactive_brokers.config import (
+    IBMarketDataTypeEnum,
+    InteractiveBrokersDataClientConfig,
+    InteractiveBrokersExecClientConfig,
     InteractiveBrokersInstrumentProviderConfig,
     SymbologyMethod,
 )
-
-from nautilus_trader.adapters.interactive_brokers.config import InteractiveBrokersDataClientConfig
-from nautilus_trader.adapters.interactive_brokers.config import IBMarketDataTypeEnum
-
-from nautilus_trader.adapters.interactive_brokers.config import InteractiveBrokersExecClientConfig
-from nautilus_trader.config import RoutingConfig
-from nautilus_trader.adapters.interactive_brokers.common import IB
-
-from nautilus_trader.config import TradingNodeConfig
-from nautilus_trader.config import LoggingConfig
-from nautilus_trader.config import LiveDataEngineConfig
+from nautilus_trader.config import (
+    LiveDataEngineConfig,
+    LoggingConfig,
+    RoutingConfig,
+    TradingNodeConfig,
+)
 
 load_dotenv()
 
