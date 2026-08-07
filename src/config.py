@@ -41,7 +41,7 @@ data_client_config = InteractiveBrokersDataClientConfig(
 # Execution client configuration
 exec_client_config = InteractiveBrokersExecClientConfig(
     ibg_host="127.0.0.1",
-    ibg_port=4002,  # TWS paper trading
+    ibg_port=4002,  # IBgateway paper trading
     ibg_client_id=2,
     account_id=os.environ.get("TWS_ACCOUNT"),  # Your paper trading account
     instrument_provider=instrument_provider_config,
