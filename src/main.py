@@ -36,7 +36,7 @@ def main() -> None:
 
     try:
         gateway.start()
-
+ 
         if not gateway.is_logged_in(gateway.container):
             print("\nAUTHENTICATION FAILED: Printing container logs:")
             print(gateway.container.logs())

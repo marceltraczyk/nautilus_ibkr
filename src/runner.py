@@ -6,8 +6,10 @@ from nautilus_trader.adapters.interactive_brokers.factories import (
 from nautilus_trader.config import TradingNodeConfig
 from nautilus_trader.live.node import TradingNode
 from nautilus_trader.model.identifiers import InstrumentId
+from nautilus_trader.model.data import BarType
+from nautilus_trader.model.objects import Quantity
 
-from strategy import ForexPricePrinter
+from sma_cross import SmaCrossStrategy, SmaCrossConfig
 
 
 def run_trading_node(config_node: TradingNodeConfig) -> None:
@@ -17,11 +19,22 @@ def run_trading_node(config_node: TradingNodeConfig) -> None:
         node.add_data_client_factory(IB, InteractiveBrokersLiveDataClientFactory)
         node.add_exec_client_factory(IB, InteractiveBrokersLiveExecClientFactory)
 
-        instrument_id = InstrumentId.from_str("EUR/USD.IDEALPRO")
-        strategy = ForexPricePrinter(instrument_id=instrument_id)
-        node.trader.add_strategy(strategy)
-
         node.build()
+
+        strategy_config = SmaCrossConfig(
+            instrument_id=InstrumentId.from_str("EUR/USD.IDEALPRO"),
+            bar_type=BarType.from_str("EUR/USD.IDEALPRO-1-MINUTE-MID-EXTERNAL"),
+            fast_sma=5,
+            slow_sma=15,
+            trade_size=Quantity.from_int(1000)  # Ustawiamy 1K jak z Twoich wcześniejszych screenów
+                )
+                
+        # 2. Inicjalizujemy strategię
+        strategy = SmaCrossStrategy(config=strategy_config)
+        
+        # 3. Przekazujemy strategię do węzła
+        # 3. Przekazujemy strategię do obiektu trader wewnątrz węzła
+        node.trader.add_strategy(strategy)
 
         node.run()
     finally:
