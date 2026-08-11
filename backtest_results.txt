@@ -1,108 +1,72 @@
 
 ================================================================================
-                        NAUTILUS TRADER BACKTEST REPORT
+                    NAUTILUS TRADER BACKTEST REPORT
 ================================================================================
 
 --- ACCOUNT REPORT ---
-                              total locked      free currency    account_id account_type base_currency margins  reported info
-2026-08-05 21:16:00+00:00  10000.00   0.00  10000.00      USD  IDEALPRO-001       MARGIN           USD      []      True   {}
-2026-08-05 21:45:00+00:00  10000.00   0.00  10000.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:45:00+00:00  10000.00   0.00  10000.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:48:00+00:00  10000.00   0.00  10000.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:48:00+00:00   9987.00   0.00   9987.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:52:00+00:00   9987.00   0.00   9987.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:52:00+00:00   9987.00   0.00   9987.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:57:00+00:00   9987.00   0.00   9987.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 21:57:00+00:00   9969.00   0.00   9969.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:02:00+00:00   9969.00   0.00   9969.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:02:00+00:00   9969.00   0.00   9969.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:07:00+00:00   9969.00   0.00   9969.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:07:00+00:00   9926.00   0.00   9926.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:15:00+00:00   9926.00   0.00   9926.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:15:00+00:00   9926.00   0.00   9926.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:32:00+00:00   9926.00   0.00   9926.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:32:00+00:00   9923.00   0.00   9923.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:33:00+00:00   9923.00   0.00   9923.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:33:00+00:00   9923.00   0.00   9923.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:41:00+00:00   9923.00   0.00   9923.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:41:00+00:00   9913.00   0.00   9913.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:46:00+00:00   9913.00   0.00   9913.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:46:00+00:00   9913.00   0.00   9913.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:54:00+00:00   9913.00   0.00   9913.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 22:54:00+00:00   9897.00   0.00   9897.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:01:00+00:00   9897.00   0.00   9897.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:01:00+00:00   9897.00   0.00   9897.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:11:00+00:00   9897.00   0.00   9897.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:11:00+00:00   9884.00   0.00   9884.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:13:00+00:00   9884.00   0.00   9884.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:13:00+00:00   9884.00   0.00   9884.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:26:00+00:00   9884.00   0.00   9884.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:26:00+00:00   9870.00   0.00   9870.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:39:00+00:00   9870.00   0.00   9870.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:39:00+00:00   9870.00   0.00   9870.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:58:00+00:00   9870.00   0.00   9870.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
-2026-08-05 23:58:00+00:00   9866.00   0.00   9866.00      USD  IDEALPRO-001       MARGIN           USD      []     False   {}
+                               total locked       free currency    account_id account_type base_currency margins  reported info
+2025-01-02 00:15:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []      True   {}
+2025-01-02 20:30:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-01-03 05:30:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-01-06 01:15:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-01-07 03:30:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+...                              ...    ...        ...      ...           ...          ...           ...     ...       ...  ...
+2025-12-24 09:00:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-12-30 09:30:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-12-30 16:45:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-12-31 01:00:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+2025-12-31 09:45:00+00:00  100000.00   0.00  100000.00      EUR  IDEALPRO-001       MARGIN           EUR      []     False   {}
+
+[338 rows x 10 columns]
 
 --- ORDER FILLS REPORT ---
-                                              trader_id           strategy_id     instrument_id  venue_order_id  ...  tags                               init_id                   ts_init                   ts_last
-client_order_id                                                                                                  ...                                                                                                
-O-20260805-214500-BACKTEST-000-1   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-001  ...  None  79a150a3-3c77-4d2e-897f-2649c92a152f 2026-08-05 21:45:00+00:00 2026-08-05 21:45:00+00:00
-O-20260805-214800-BACKTEST-000-2   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-002  ...  None  82d46fe1-acfc-421f-aae3-6164acaf650c 2026-08-05 21:48:00+00:00 2026-08-05 21:48:00+00:00
-O-20260805-215200-BACKTEST-000-3   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-003  ...  None  ba440ea4-5578-46dc-ba25-2e702c93a934 2026-08-05 21:52:00+00:00 2026-08-05 21:52:00+00:00
-O-20260805-215700-BACKTEST-000-4   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-004  ...  None  1548eb26-562e-4cd8-95f8-f5f01b80f149 2026-08-05 21:57:00+00:00 2026-08-05 21:57:00+00:00
-O-20260805-220200-BACKTEST-000-5   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-005  ...  None  26bbc365-28aa-4dd3-ad3e-7d04294c9a21 2026-08-05 22:02:00+00:00 2026-08-05 22:02:00+00:00
-O-20260805-220700-BACKTEST-000-6   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-006  ...  None  9b446919-0e42-4bb8-80f8-48ffe94dc639 2026-08-05 22:07:00+00:00 2026-08-05 22:07:00+00:00
-O-20260805-221500-BACKTEST-000-7   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-007  ...  None  9663b001-7607-4076-ae6c-37390c611923 2026-08-05 22:15:00+00:00 2026-08-05 22:15:00+00:00
-O-20260805-223200-BACKTEST-000-8   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-008  ...  None  0f736f6d-32ae-47b1-8599-a1ea544c525f 2026-08-05 22:32:00+00:00 2026-08-05 22:32:00+00:00
-O-20260805-223300-BACKTEST-000-9   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-009  ...  None  ca033b44-059a-448b-8a08-a550db4d35f6 2026-08-05 22:33:00+00:00 2026-08-05 22:33:00+00:00
-O-20260805-224100-BACKTEST-000-10  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-010  ...  None  9dee19d9-01e9-4ca3-86d0-d738e2532605 2026-08-05 22:41:00+00:00 2026-08-05 22:41:00+00:00
-O-20260805-224600-BACKTEST-000-11  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-011  ...  None  dadd8bbd-d89d-47ae-b078-f6d270609660 2026-08-05 22:46:00+00:00 2026-08-05 22:46:00+00:00
-O-20260805-225400-BACKTEST-000-12  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-012  ...  None  756ff70b-8641-42e7-b474-26239f37d896 2026-08-05 22:54:00+00:00 2026-08-05 22:54:00+00:00
-O-20260805-230100-BACKTEST-000-13  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-013  ...  None  504a81a4-5c0f-4350-ad27-dc4741a9409a 2026-08-05 23:01:00+00:00 2026-08-05 23:01:00+00:00
-O-20260805-231100-BACKTEST-000-14  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-014  ...  None  e0009221-ad2d-4c8e-b391-d4fb9b1648f5 2026-08-05 23:11:00+00:00 2026-08-05 23:11:00+00:00
-O-20260805-231300-BACKTEST-000-15  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-015  ...  None  8a3397ee-5762-41d5-8fc1-b05ffda5aa59 2026-08-05 23:13:00+00:00 2026-08-05 23:13:00+00:00
-O-20260805-232600-BACKTEST-000-16  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-016  ...  None  15385b87-d8e8-42b2-8c3a-89875a546dcf 2026-08-05 23:26:00+00:00 2026-08-05 23:26:00+00:00
-O-20260805-233900-BACKTEST-000-17  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-017  ...  None  2e244f8d-7dbc-4262-b55d-b8018cc0ff17 2026-08-05 23:39:00+00:00 2026-08-05 23:39:00+00:00
-O-20260805-235800-BACKTEST-000-18  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-018  ...  None  a05afc25-fed0-4852-93b7-fdd3e90467cd 2026-08-05 23:58:00+00:00 2026-08-05 23:58:00+00:00
+                                                       trader_id                strategy_id     instrument_id  ...                               init_id                   ts_init                   ts_last
+client_order_id                                                                                                ...                                                                                          
+O-20250102-100000-BACKTEST-000-1    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  5c3139ab-3058-4414-9fe7-7fef3f426a4c 2025-01-02 10:00:00+00:00 2025-01-02 10:00:00+00:00
+O-20250102-203000-BACKTEST-000-2    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  0d345f4a-03c5-4531-85cc-8cb85e5c8c75 2025-01-02 20:30:00+00:00 2025-01-02 20:30:00+00:00
+O-20250103-051500-BACKTEST-000-3    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  a8de8f1d-f160-4387-8c56-c0f23a15956c 2025-01-03 05:15:00+00:00 2025-01-03 05:15:00+00:00
+O-20250103-053000-BACKTEST-000-4    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  642e118f-b46f-44d0-bc65-381b386fd454 2025-01-03 05:30:00+00:00 2025-01-03 05:30:00+00:00
+O-20250106-001500-BACKTEST-000-5    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  7def5ed2-e844-4857-bf9d-9d15437c595d 2025-01-06 00:15:00+00:00 2025-01-06 00:15:00+00:00
+...                                                          ...                        ...               ...  ...                                   ...                       ...                       ...
+O-20251230-164500-BACKTEST-000-670  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  b5dcbe30-277f-4f9c-9654-b9ca340d9e9d 2025-12-30 16:45:00+00:00 2025-12-30 16:45:00+00:00
+O-20251230-190000-BACKTEST-000-671  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  b2fc4ccb-d943-4f81-8bce-7854aa379254 2025-12-30 19:00:00+00:00 2025-12-30 19:00:00+00:00
+O-20251231-010000-BACKTEST-000-672  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  a251a979-4198-469d-ae5d-e05bdff31729 2025-12-31 01:00:00+00:00 2025-12-31 01:00:00+00:00
+O-20251231-020000-BACKTEST-000-673  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  94f3d2a8-545e-4a35-964f-6d84dc77feab 2025-12-31 02:00:00+00:00 2025-12-31 02:00:00+00:00
+O-20251231-094500-BACKTEST-000-674  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  aa4119ae-e050-42d8-bf35-202e256a6245 2025-12-31 09:45:00+00:00 2025-12-31 09:45:00+00:00
 
-[18 rows x 31 columns]
+[674 rows x 31 columns]
 
 --- POSITIONS REPORT ---
-                                                               trader_id           strategy_id     instrument_id    account_id  ... commissions realized_return realized_pnl is_snapshot
-position_id                                                                                                                     ...                                                     
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-0f461560-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00011   -13.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-2b134ab1-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00016   -18.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-4be4798a-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00037   -43.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-8129fb7a-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00003    -3.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-6d6f1147-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00009   -10.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-f66da2c3-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00014   -16.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-65b44707-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00011   -13.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000-867cf640-...  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00012   -14.00 USD        True
-EUR/USD.IDEALPRO-SmaCrossStrategy-000               IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00003    -4.00 USD       False
+                                   trader_id                strategy_id     instrument_id    account_id  ... commissions realized_return realized_pnl is_snapshot
+position_id                                                                                              ...                                                     
+IDEALPRO-1-001  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00874  -905.00 USD       False
+IDEALPRO-1-002  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]         0.00044    45.00 USD       False
+IDEALPRO-1-003  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]         0.00085    88.00 USD       False
+IDEALPRO-1-004  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]         0.00030    31.00 USD       False
+IDEALPRO-1-005  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00374  -387.00 USD       False
+...                                      ...                        ...               ...           ...  ...         ...             ...          ...         ...
+IDEALPRO-1-333  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]         0.00132   155.00 USD       False
+IDEALPRO-1-334  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]         0.00068    80.00 USD       False
+IDEALPRO-1-335  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00020   -23.00 USD       False
+IDEALPRO-1-336  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00031   -37.00 USD       False
+IDEALPRO-1-337  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-001  ...  [0.00 USD]        -0.00053   -62.00 USD       False
 
-[9 rows x 21 columns]
+[337 rows x 21 columns]
 
 --- ORDERS REPORT ---
-                                              trader_id           strategy_id     instrument_id  venue_order_id  ...  tags                               init_id              ts_init              ts_last
-client_order_id                                                                                                  ...                                                                                      
-O-20260805-214500-BACKTEST-000-1   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-001  ...  None  79a150a3-3c77-4d2e-897f-2649c92a152f  1785966300000000000  1785966300000000000
-O-20260805-214800-BACKTEST-000-2   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-002  ...  None  82d46fe1-acfc-421f-aae3-6164acaf650c  1785966480000000000  1785966480000000000
-O-20260805-215200-BACKTEST-000-3   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-003  ...  None  ba440ea4-5578-46dc-ba25-2e702c93a934  1785966720000000000  1785966720000000000
-O-20260805-215700-BACKTEST-000-4   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-004  ...  None  1548eb26-562e-4cd8-95f8-f5f01b80f149  1785967020000000000  1785967020000000000
-O-20260805-220200-BACKTEST-000-5   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-005  ...  None  26bbc365-28aa-4dd3-ad3e-7d04294c9a21  1785967320000000000  1785967320000000000
-O-20260805-220700-BACKTEST-000-6   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-006  ...  None  9b446919-0e42-4bb8-80f8-48ffe94dc639  1785967620000000000  1785967620000000000
-O-20260805-221500-BACKTEST-000-7   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-007  ...  None  9663b001-7607-4076-ae6c-37390c611923  1785968100000000000  1785968100000000000
-O-20260805-223200-BACKTEST-000-8   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-008  ...  None  0f736f6d-32ae-47b1-8599-a1ea544c525f  1785969120000000000  1785969120000000000
-O-20260805-223300-BACKTEST-000-9   IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-009  ...  None  ca033b44-059a-448b-8a08-a550db4d35f6  1785969180000000000  1785969180000000000
-O-20260805-224100-BACKTEST-000-10  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-010  ...  None  9dee19d9-01e9-4ca3-86d0-d738e2532605  1785969660000000000  1785969660000000000
-O-20260805-224600-BACKTEST-000-11  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-011  ...  None  dadd8bbd-d89d-47ae-b078-f6d270609660  1785969960000000000  1785969960000000000
-O-20260805-225400-BACKTEST-000-12  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-012  ...  None  756ff70b-8641-42e7-b474-26239f37d896  1785970440000000000  1785970440000000000
-O-20260805-230100-BACKTEST-000-13  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-013  ...  None  504a81a4-5c0f-4350-ad27-dc4741a9409a  1785970860000000000  1785970860000000000
-O-20260805-231100-BACKTEST-000-14  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-014  ...  None  e0009221-ad2d-4c8e-b391-d4fb9b1648f5  1785971460000000000  1785971460000000000
-O-20260805-231300-BACKTEST-000-15  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-015  ...  None  8a3397ee-5762-41d5-8fc1-b05ffda5aa59  1785971580000000000  1785971580000000000
-O-20260805-232600-BACKTEST-000-16  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-016  ...  None  15385b87-d8e8-42b2-8c3a-89875a546dcf  1785972360000000000  1785972360000000000
-O-20260805-233900-BACKTEST-000-17  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-017  ...  None  2e244f8d-7dbc-4262-b55d-b8018cc0ff17  1785973140000000000  1785973140000000000
-O-20260805-235800-BACKTEST-000-18  IBKR-EURUSD-BACKTEST  SmaCrossStrategy-000  EUR/USD.IDEALPRO  IDEALPRO-1-018  ...  None  a05afc25-fed0-4852-93b7-fdd3e90467cd  1785974280000000000  1785974280000000000
+                                                       trader_id                strategy_id     instrument_id  ...                               init_id              ts_init              ts_last
+client_order_id                                                                                                ...                                                                                
+O-20250102-100000-BACKTEST-000-1    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  5c3139ab-3058-4414-9fe7-7fef3f426a4c  1735812000000000000  1735812000000000000
+O-20250102-203000-BACKTEST-000-2    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  0d345f4a-03c5-4531-85cc-8cb85e5c8c75  1735849800000000000  1735849800000000000
+O-20250103-051500-BACKTEST-000-3    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  a8de8f1d-f160-4387-8c56-c0f23a15956c  1735881300000000000  1735881300000000000
+O-20250103-053000-BACKTEST-000-4    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  642e118f-b46f-44d0-bc65-381b386fd454  1735882200000000000  1735882200000000000
+O-20250106-001500-BACKTEST-000-5    IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  7def5ed2-e844-4857-bf9d-9d15437c595d  1736122500000000000  1736122500000000000
+...                                                          ...                        ...               ...  ...                                   ...                  ...                  ...
+O-20251230-164500-BACKTEST-000-670  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  b5dcbe30-277f-4f9c-9654-b9ca340d9e9d  1767113100000000000  1767113100000000000
+O-20251230-190000-BACKTEST-000-671  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  b2fc4ccb-d943-4f81-8bce-7854aa379254  1767121200000000000  1767121200000000000
+O-20251231-010000-BACKTEST-000-672  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  a251a979-4198-469d-ae5d-e05bdff31729  1767142800000000000  1767142800000000000
+O-20251231-020000-BACKTEST-000-673  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  94f3d2a8-545e-4a35-964f-6d84dc77feab  1767146400000000000  1767146400000000000
+O-20251231-094500-BACKTEST-000-674  IBKR-MEAN-REVERSION-BACKTEST  MeanReversionStrategy-000  EUR/USD.IDEALPRO  ...  aa4119ae-e050-42d8-bf35-202e256a6245  1767174300000000000  1767174300000000000
 
-[18 rows x 31 columns]
+[674 rows x 31 columns]
 ================================================================================

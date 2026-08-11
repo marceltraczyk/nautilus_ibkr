@@ -8,8 +8,8 @@ from nautilus_trader.adapters.interactive_brokers.gateway import (
     DockerizedIBGatewayConfig,
 )
 
-from config import config_node
-from runner import run_trading_node
+#from config import config_node
+#from runner import run_trading_node
 
 
 def main() -> None:
@@ -45,7 +45,7 @@ def main() -> None:
         print("\nSUCCESS: Authenticated with IB Gateway!")
         time.sleep(5)  # Allow IB Gateway API socket server to fully initialize
 
-        run_trading_node(config_node)
+        #run_trading_node(config_node)
     except KeyboardInterrupt:
         print("\nGracefully shutting down market data stream...")
     except Exception as error:  # noqa: BLE001 Should be fixed to a more specific exception type if possible
