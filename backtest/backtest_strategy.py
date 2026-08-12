@@ -1,9 +1,6 @@
 import sys
 sys.path.insert(0, "/home/marce/nautilus_ikbr")
 
-import matplotlib.pyplot as plt
-import pandas as pd
-from decimal import Decimal
 from nautilus_trader.backtest.engine import BacktestEngine, BacktestEngineConfig
 from nautilus_trader.config import ExecEngineConfig, RiskEngineConfig
 from nautilus_trader.model.currencies import USD
@@ -11,7 +8,9 @@ from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.identifiers import Venue
 from nautilus_trader.model.objects import Money
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
-from nautilus_trader.backtest.models import FillModel, MakerTakerFeeModel
+from pathlib import Path
+from nautilus_trader.analysis import create_tearsheet
+from nautilus_trader.model.currencies import USD
 
 from src.mean_reversion import MeanReversionConfig, MeanReversionStrategy
 
@@ -71,65 +70,17 @@ if __name__ == "__main__":
     engine.add_data(bars)
 
     # 6. Running the enigne(backtest)
-    print("Running backtest...")
+    print("Running backtest...\n")
     engine.run()
 
-    # 5. Wyciągnięcie raportów i analiza wyników
-    account_report = engine.trader.generate_account_report(IBKR_VENUE)
-    positions_report = engine.trader.generate_positions_report()
+    # 7. Generating an HTML Report
+    report_path = Path("backtest/backtest_results.html")
 
-    # 7. Wyciągnięcie raportów i analiza wyników
-    from pathlib import Path
+    print("Generating an HTML Report...\n")
+    create_tearsheet(
+        engine=engine,
+        output_path=str(report_path),
+        currency=USD,
+    )
 
-    raw_positions = engine.trader.generate_positions_report()
-    positions_df = pd.DataFrame(raw_positions)
-
-    # Nautilus używa nazwy kolumny 'realized_pnl'
-    if not positions_df.empty and "realized_pnl" in positions_df.columns:
-        # Wyciągamy samą liczbę z tekstu (np. "-62.00 USD" -> -62.00)
-        positions_df["pnl"] = (
-            positions_df["realized_pnl"]
-            .astype(str)
-            .str.extract(r"([-+]?\d*\.?\d+)")[0]
-            .astype(float)
-            .fillna(0)
-        )
-
-        total_trades = len(positions_df)
-        winning_trades = len(positions_df[positions_df["pnl"] > 0])
-        losing_trades = len(positions_df[positions_df["pnl"] < 0])
-
-        win_rate = (winning_trades / total_trades) * 100 if total_trades > 0 else 0
-        gross_profit = positions_df[positions_df["pnl"] > 0]["pnl"].sum()
-        gross_loss = abs(positions_df[positions_df["pnl"] < 0]["pnl"].sum())
-        profit_factor = gross_profit / gross_loss if gross_loss > 0 else 0.0
-        total_pnl = positions_df["pnl"].sum()
-
-        print("\n" + "=" * 50)
-        print("           KLUCZOWE WSKAŹNIKI STRATEGII          ")
-        print("=" * 50)
-        print(f"Całkowity PnL:             {total_pnl:.2f} USD")
-        print(f"Liczba transakcji:         {total_trades}")
-        print(f"Wygrane / Stratne:         {winning_trades} / {losing_trades}")
-        print(f"Win Rate:                  {win_rate:.2f}%")
-        print(f"Profit Factor:             {profit_factor:.2f}")
-        print(f"Średni zysk/strata na trade: {total_pnl / total_trades:.2f} USD")
-        print("=" * 50 + "\n")
-
-        # Wykres krzywej kapitału (Equity Curve)
-        positions_df["cumulative_pnl"] = positions_df["pnl"].cumsum() + 100_000
-        plt.figure(figsize=(12, 6))
-        plt.plot(positions_df["cumulative_pnl"], label="Equity Curve (USD)", color="#1f77b4")
-        plt.title("Krzywa Kapitału - Mean Reversion 2025")
-        plt.xlabel("Liczba transakcji")
-        plt.ylabel("Kapitał (USD)")
-        plt.grid(True, linestyle="--", alpha=0.6)
-        plt.legend()
-
-        # Zapis bezpośrednio do katalogu, w którym znajduje się skrypt
-        script_dir = Path(__file__).parent
-        chart_path = script_dir / "equity_curve.png"
-        plt.savefig(chart_path)
-        print(f"--> Wykres zapisan do: {chart_path.resolve()}")
-    else:
-        print("--> Brak zamkniętych pozycji w podanym okresie.")
+    print(f"DONE! Open this file in your browser: {report_path.resolve()}\n")
