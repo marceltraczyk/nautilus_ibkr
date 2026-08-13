@@ -1,19 +1,19 @@
 import sys
-sys.path.insert(0, "/home/marce/nautilus_ikbr")
+from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from nautilus_trader.analysis import create_tearsheet
 from nautilus_trader.backtest.engine import BacktestEngine, BacktestEngineConfig
+from nautilus_trader.backtest.models import FillModel, FixedFeeModel
 from nautilus_trader.config import ExecEngineConfig, RiskEngineConfig
 from nautilus_trader.model.currencies import USD
 from nautilus_trader.model.enums import AccountType, OmsType
 from nautilus_trader.model.identifiers import Venue
 from nautilus_trader.model.objects import Money
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
-from pathlib import Path
-from nautilus_trader.analysis import create_tearsheet
-from nautilus_trader.model.currencies import USD
 
 from src.mean_reversion import MeanReversionConfig, MeanReversionStrategy
-
 
 if __name__ == "__main__":
     # 1. Initialize the data catalog and load the EUR/USD instrument and its bars
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     engine_config = BacktestEngineConfig(
         trader_id="IBKR-BACKTEST",
         exec_engine=ExecEngineConfig(),
-        risk_engine=RiskEngineConfig(bypass=True),
+        risk_engine=RiskEngineConfig(bypass=True),  # No risk checks in backtest - revisit before live trading
     )
     engine = BacktestEngine(config=engine_config)
 
@@ -47,6 +47,8 @@ if __name__ == "__main__":
         account_type=AccountType.MARGIN,
         base_currency=USD,
         starting_balances=[Money(100_000, USD)],
+        fee_model=FixedFeeModel(Money(4.5, USD)),  # Approximates IBKR commission + half the typical EUR/USD spread
+        fill_model=FillModel(prob_slippage=0.3, random_seed=42),  # Illustrative value - tune via sensitivity testing
     )
 
     # 4. Strategy configuration and instantiation
@@ -69,7 +71,7 @@ if __name__ == "__main__":
     engine.add_instrument(eurusd)
     engine.add_data(bars)
 
-    # 6. Running the enigne(backtest)
+    # 6. Running the engine (backtest)
     print("Running backtest...\n")
     engine.run()
 
