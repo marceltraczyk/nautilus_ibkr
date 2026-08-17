@@ -2,3 +2,11 @@
 .env
 __pycache__/
 .ruff_cache/
+
+# Parquet data catalogs - regenerate via data_collection/download_data.py, don't version binary data
+data/
+**/data_catalog/
+*.parquet
+
+# Backtest tearsheet - 5 MB, regenerated on every backtest run
+backtest/backtest_results.html

@@ -55,13 +55,6 @@ if __name__ == "__main__":
     strategy_config = MeanReversionConfig(
         instrument_id=eurusd.id,
         bar_type=eurusd_bar_type,
-        bb_period=21,
-        bb_deviation=2.0,
-        rsi_period=14,
-        rsi_overbought=70.0,
-        rsi_oversold=30.0,
-        er_period=14,
-        max_er=0.30,
         trade_size=eurusd.make_qty(100_000),
     )
     strategy = MeanReversionStrategy(config=strategy_config)
