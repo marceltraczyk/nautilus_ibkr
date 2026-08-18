@@ -17,7 +17,7 @@ from src.mean_reversion import MeanReversionConfig, MeanReversionStrategy
 
 if __name__ == "__main__":
     # 1. Initialize the data catalog and load the EUR/USD instrument and its bars
-    CATALOG_PATH = "./backtest/data_catalog"
+    CATALOG_PATH = Path(__file__).resolve().parent.parent / "data_collection" / "parquet_data"
 
     catalog = ParquetDataCatalog(CATALOG_PATH)
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     engine.run()
 
     # 7. Generating an HTML Report
-    report_path = Path("backtest/backtest_results.html")
+    report_path = Path(__file__).resolve().parent / "backtest_results.html"
 
     print("Generating an HTML Report...\n")
     create_tearsheet(

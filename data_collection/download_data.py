@@ -1,8 +1,21 @@
+"""Download 15-minute FX bars from Interactive Brokers into a Parquet catalog.
+
+Run from anywhere - paths are resolved relative to this file:
+
+    .venv/bin/python data_collection/download_data.py
+
+The script is resumable: re-running it skips everything already stored, so a
+run interrupted halfway (or one that hit IB pacing limits) can simply be
+started again to backfill the rest.
+"""
+
 import asyncio
 import datetime
 import os
 import sys
 import time
+from collections import deque
+from pathlib import Path
 
 import pandas as pd
 from dotenv import load_dotenv
@@ -14,18 +27,33 @@ from nautilus_trader.adapters.interactive_brokers.gateway import (
 from nautilus_trader.adapters.interactive_brokers.historical.client import (
     HistoricInteractiveBrokersClient,
 )
+from nautilus_trader.model.data import Bar
 from nautilus_trader.persistence.catalog import ParquetDataCatalog
 
 
 # --- Configuration ----------------------------------------------------------
-CATALOG_PATH = "./data/fx_catalog"
-BAR_SPEC = "15-MINUTE-MID"
-START_DATE = datetime.datetime(2016, 1, 1, tzinfo=datetime.timezone.utc)
-END_DATE = datetime.datetime(2026, 1, 1, tzinfo=datetime.timezone.utc)
+CATALOG_PATH = Path(__file__).parent / "parquet_data"
 
-CHUNK = "3MS"  # 3-month request windows keep IB from timing out
-PACING_SLEEP = 2.0  # IB allows 60 historical requests per 10 minutes
+# FX on IDEALPRO has no trades, so LAST returns nothing - MID is the bid/ask midpoint
+BAR_SPEC = "15-MINUTE-MID"
+
+# Naive datetimes on purpose: request_bars() takes the timezone separately via
+# tz_name, and pandas rejects a tz-aware datetime alongside a tz argument.
+END_DATE = datetime.datetime.now(datetime.timezone.utc).replace(
+    hour=0, minute=0, second=0, microsecond=0, tzinfo=None,
+)
+START_DATE = (pd.Timestamp(END_DATE) - pd.DateOffset(years=10)).to_pydatetime()
+
+# IB derives one request per window; a 10-year window would be rejected outright
+CHUNK = "3MS"
+
+# IB allows 60 historical requests per 10 minutes - 55 leaves headroom
+MAX_REQUESTS_PER_WINDOW = 55
+PACING_WINDOW = 600.0
+
 MAX_RETRIES = 2
+RETRY_SLEEP = 5.0
+PACING_VIOLATION_SLEEP = 60.0
 REQUEST_TIMEOUT = 180
 
 # Base/quote order follows FX convention: EUR > GBP > AUD > NZD > USD > CAD > CHF > JPY.
@@ -40,91 +68,151 @@ FX_PAIRS = [
 ]
 
 
+class PacingLimiter:
+    """Keeps the request rate under IB's historical data cap.
+
+    IB counts requests over a sliding ten-minute window, so tracking send times
+    beats a fixed sleep: slow requests consume the wait on their own and only a
+    genuine burst has to pause.
+    """
+
+    def __init__(self, max_requests: int, window: float) -> None:
+        self._max = max_requests
+        self._window = window
+        self._sent: deque[float] = deque()
+
+    async def acquire(self) -> None:
+        while True:
+            now = time.monotonic()
+
+            while self._sent and now - self._sent[0] > self._window:
+                self._sent.popleft()
+
+            if len(self._sent) < self._max:
+                self._sent.append(now)
+                return
+
+            wait = self._window - (now - self._sent[0]) + 1.0
+            print(f"     pacing: sleeping {wait:.0f}s to stay under IB's cap", flush=True)
+            await asyncio.sleep(wait)
+
+
 def build_chunks(start, end):
     """Split the full range into request windows, keeping the final partial one."""
-    edges = pd.date_range(start=start, end=end, freq=CHUNK, tz="UTC")
+    edges = pd.date_range(start=start, end=end, freq=CHUNK)
+    edges = edges[edges > pd.Timestamp(start)]
+    edges = pd.DatetimeIndex([pd.Timestamp(start)]).append(edges)
 
-    if len(edges) == 0 or edges[0] > pd.Timestamp(start):
-        edges = pd.DatetimeIndex([pd.Timestamp(start)]).append(edges)
     if edges[-1] < pd.Timestamp(end):
         edges = edges.append(pd.DatetimeIndex([pd.Timestamp(end)]))
 
-    return [(edges[i].to_pydatetime(), edges[i + 1].to_pydatetime())
-            for i in range(len(edges) - 1)]
+    return [
+        (edges[i].to_pydatetime(), edges[i + 1].to_pydatetime())
+        for i in range(len(edges) - 1)
+    ]
 
 
-def latest_saved(catalog, bar_type_str):
-    """Return the newest ts_init already stored for this bar type, or 0."""
+def stored_cutoff(catalog, bar_type: str) -> int:
+    """Newest bar timestamp (ns) already stored for this bar type, or 0."""
     try:
-        existing = catalog.bars(bar_types=[bar_type_str])
+        last = catalog.query_last_timestamp(Bar, bar_type)
     except Exception:
         return 0
 
-    return max((b.ts_init for b in existing), default=0)
+    return 0 if last is None else int(last.value)
 
 
-async def download_pair(client, catalog, base, quote, chunks, stats):
-    """Download one currency pair chunk by chunk, skipping what is already stored."""
-    contract = IBContract(
-        secType="CASH", symbol=base, currency=quote, exchange="IDEALPRO"
-    )
+async def request_chunk(client, limiter, contract, chunk_start, chunk_end):
+    """Request one window, retrying on failure. Returns None when it gave up."""
+    for attempt in range(1, MAX_RETRIES + 2):
+        await limiter.acquire()
+
+        try:
+            return await client.request_bars(
+                bar_specifications=[BAR_SPEC],
+                start_date_time=chunk_start,
+                end_date_time=chunk_end,
+                tz_name="UTC",
+                contracts=[contract],
+                use_rth=False,  # FX trades around the clock - RTH would drop most bars
+                timeout=REQUEST_TIMEOUT,
+            )
+        except Exception as error:
+            message = str(error)
+            print(
+                f"     attempt {attempt} failed "
+                f"({chunk_start.date()} -> {chunk_end.date()}): {message}",
+                flush=True,
+            )
+
+            if attempt > MAX_RETRIES:
+                return None
+
+            # A pacing violation needs a long cool-off, anything else a short one
+            cool_off = PACING_VIOLATION_SLEEP if "pacing" in message.lower() else RETRY_SLEEP
+            await asyncio.sleep(cool_off)
+
+    return None
+
+
+async def download_pair(client, catalog, limiter, base, quote, chunks, stats):
+    """Download one currency pair window by window, skipping what is already stored."""
+    contract = IBContract(secType="CASH", symbol=base, currency=quote, exchange="IDEALPRO")
 
     instruments = await client.request_instruments(contracts=[contract])
     if not instruments:
-        print(f"  !! {base}/{quote}: instrument not found at IB - skipping")
+        print(f"  !! {base}/{quote}: instrument not found at IB - skipping", flush=True)
         stats["failed_pairs"].append(f"{base}/{quote}")
         return
 
-    catalog.write_data(instruments)
-    instrument_id = instruments[0].id
-    bar_type_str = f"{instrument_id}-{BAR_SPEC}-EXTERNAL"
+    instrument = instruments[0]
+    if str(instrument.id) not in stats["known_instruments"]:
+        catalog.write_data(instruments)
+        stats["known_instruments"].add(str(instrument.id))
 
+    bar_type = f"{instrument.id}-{BAR_SPEC}-EXTERNAL"
+
+    # Read the resume point once per pair rather than once per window
+    cutoff = stored_cutoff(catalog, bar_type)
     saved = 0
-    for chunk_start, chunk_end in chunks:
-        # Resume support: skip windows that are already fully stored
-        cutoff = latest_saved(catalog, bar_type_str)
-        if cutoff and pd.Timestamp(cutoff, unit="ns", tz="UTC") >= pd.Timestamp(chunk_end):
+    skipped = 0
+
+    for number, (chunk_start, chunk_end) in enumerate(chunks, start=1):
+        if cutoff and cutoff >= int(pd.Timestamp(chunk_end).value):
+            skipped += 1
             continue
 
-        bars = None
-        for attempt in range(1, MAX_RETRIES + 2):
-            try:
-                bars = await client.request_bars(
-                    bar_specifications=[BAR_SPEC],
-                    start_date_time=chunk_start,
-                    end_date_time=chunk_end,
-                    tz_name="UTC",
-                    contracts=[contract],
-                    use_rth=False,
-                    timeout=REQUEST_TIMEOUT,
-                )
-                break
-            except Exception as e:
-                print(f"     attempt {attempt} failed ({chunk_start.date()}): {e}")
-                bars = None
-                if attempt <= MAX_RETRIES:
-                    await asyncio.sleep(5)
+        bars = await request_chunk(client, limiter, contract, chunk_start, chunk_end)
 
-        if not bars:
+        if bars is None:
+            print(f"     [{number:>2}/{len(chunks)}] {chunk_start.date()} -> failed", flush=True)
             stats["failed_chunks"] += 1
-            await asyncio.sleep(PACING_SLEEP)
             continue
-
-        # IB often returns bars earlier than requested, which would overlap files
-        # already in the catalog and break its disjoint-interval invariant
-        fresh = [b for b in bars if b.ts_init > cutoff]
-        if fresh:
-            catalog.write_data(fresh)
-            saved += len(fresh)
 
         stats["requests"] += 1
-        await asyncio.sleep(PACING_SLEEP)
 
-    print(f"  -> {base}/{quote}: {saved:,} bars stored")
+        # IB anchors on end_date_time and counts trading days backwards, so it
+        # hands back bars from before chunk_start. Writing those would overlap
+        # the previous file and break the catalog's disjoint-interval invariant.
+        fresh = [bar for bar in bars if bar.ts_init > cutoff]
+
+        if fresh:
+            catalog.write_data(fresh)
+            cutoff = max(bar.ts_init for bar in fresh)
+            saved += len(fresh)
+
+        print(
+            f"     [{number:>2}/{len(chunks)}] {chunk_start.date()} -> {chunk_end.date()}   "
+            f"{len(fresh):>6,} bars   (pair total {saved:,})",
+            flush=True,
+        )
+
+    resumed = f", {skipped} windows already stored" if skipped else ""
+    print(f"  -> {base}/{quote}: {saved:,} bars stored{resumed}", flush=True)
     stats["bars"] += saved
 
 
-async def main():
+async def main() -> None:
     # 1. Authenticate and start the IB Gateway container
     load_dotenv()
     username = os.environ.get("TWS_USERNAME")
@@ -135,8 +223,11 @@ async def main():
         sys.exit(1)
 
     gateway = DockerizedIBGateway(config=DockerizedIBGatewayConfig(
-        username=username, password=password,
-        trading_mode="paper", read_only_api=True, timeout=300,
+        username=username,
+        password=password,
+        trading_mode="paper",
+        read_only_api=True,
+        timeout=300,
     ))
 
     print("Starting Interactive Brokers Gateway container...\n")
@@ -151,47 +242,82 @@ async def main():
 
     # 2. Connect the historical data client
     client = HistoricInteractiveBrokersClient(
-        host="127.0.0.1", port=4002, client_id=5, log_level="WARN",
+        host="127.0.0.1",
+        port=4002,
+        client_id=5,
+        log_level="WARN",
     )
 
-    stats = {"bars": 0, "requests": 0, "failed_chunks": 0, "failed_pairs": []}
+    catalog = ParquetDataCatalog(CATALOG_PATH)
+    chunks = build_chunks(START_DATE, END_DATE)
+    limiter = PacingLimiter(MAX_REQUESTS_PER_WINDOW, PACING_WINDOW)
+
+    try:
+        known_instruments = {str(i.id) for i in catalog.instruments()}
+    except Exception:
+        known_instruments = set()
+
+    stats = {
+        "bars": 0,
+        "requests": 0,
+        "failed_chunks": 0,
+        "failed_pairs": [],
+        "known_instruments": known_instruments,
+    }
+
     started = time.time()
+    crashed = False
 
     try:
         await client.connect()
         # IB's historical data farm (cashhmds) connects after the socket does
         await asyncio.sleep(5)
 
-        catalog = ParquetDataCatalog(CATALOG_PATH)
-        chunks = build_chunks(START_DATE, END_DATE)
+        total_requests = len(FX_PAIRS) * len(chunks)
+        estimate = total_requests / MAX_REQUESTS_PER_WINDOW * PACING_WINDOW / 3600
 
         print(f"Catalog:   {CATALOG_PATH}")
         print(f"Bar spec:  {BAR_SPEC}")
         print(f"Range:     {START_DATE.date()} -> {END_DATE.date()}")
-        print(f"Pairs:     {len(FX_PAIRS)}   chunks/pair: {len(chunks)}   "
-              f"total requests: {len(FX_PAIRS) * len(chunks)}\n")
+        print(f"Pairs:     {len(FX_PAIRS)}   windows/pair: {len(chunks)}   "
+              f"requests: {total_requests}")
+        print(f"Estimated: {estimate:.1f} h at IB's pacing limit "
+              f"(far less when resuming)\n", flush=True)
 
         # 3. Download every pair, one at a time
-        for i, (base, quote) in enumerate(FX_PAIRS, start=1):
-            elapsed = time.time() - started
-            print(f"[{i}/{len(FX_PAIRS)}] {base}/{quote}   "
-                  f"(elapsed {elapsed/60:.0f} min, {stats['bars']:,} bars so far)")
-            await download_pair(client, catalog, base, quote, chunks, stats)
+        for index, (base, quote) in enumerate(FX_PAIRS, start=1):
+            elapsed = (time.time() - started) / 60
+            remaining = total_requests - stats["requests"]
+            eta = remaining / MAX_REQUESTS_PER_WINDOW * PACING_WINDOW / 60
 
-    except Exception as e:
-        print(f"\nFatal error: {e}\n")
+            print(f"\n[{index}/{len(FX_PAIRS)}] {base}/{quote}   "
+                  f"(elapsed {elapsed:.0f} min, ETA {eta:.0f} min, "
+                  f"{stats['bars']:,} bars so far)", flush=True)
+            await download_pair(client, catalog, limiter, base, quote, chunks, stats)
+
+    except Exception as error:
+        crashed = True
+        print(f"\nFatal error: {error}\n")
     finally:
-        # 4. Report and shut down
-        mins = (time.time() - started) / 60
+        # 4. Report, then shut down the client before the gateway it talks through
+        minutes = (time.time() - started) / 60
         print("\n" + "=" * 60)
         print(f"Bars stored:      {stats['bars']:,}")
         print(f"Requests sent:    {stats['requests']:,}")
-        print(f"Failed chunks:    {stats['failed_chunks']}")
+        print(f"Failed windows:   {stats['failed_chunks']}")
         print(f"Failed pairs:     {stats['failed_pairs'] or 'none'}")
-        print(f"Elapsed:          {mins:.0f} min")
+        print(f"Elapsed:          {minutes:.0f} min")
         print("=" * 60)
+
+        client._client.stop()
+        await asyncio.sleep(1)
+
         print("\nStopping IB Gateway container...\n")
         gateway.stop()
+
+    # Non-zero exit so an unattended run can be told apart from a clean one
+    if crashed or stats["failed_pairs"] or stats["failed_chunks"]:
+        sys.exit(1)
 
 
 if __name__ == "__main__":
