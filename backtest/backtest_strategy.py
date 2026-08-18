@@ -16,7 +16,7 @@ from nautilus_trader.persistence.catalog import ParquetDataCatalog
 from src.mean_reversion import MeanReversionConfig, MeanReversionStrategy
 
 if __name__ == "__main__":
-    # 1. Initialize the data catalog and load the EUR/USD instrument and its bars
+    # 1. Load the instrument and its bars from the catalog
     CATALOG_PATH = Path(__file__).resolve().parent.parent / "data_collection" / "parquet_data"
 
     catalog = ParquetDataCatalog(CATALOG_PATH)
@@ -31,15 +31,15 @@ if __name__ == "__main__":
     print(f"Detected bar type: {eurusd_bar_type}")
     print(f"Number of bars loaded into memory: {len(bars)}")
 
-    # 2. Initializing the engine configuration
+    # 2. Engine
     engine_config = BacktestEngineConfig(
         trader_id="IBKR-BACKTEST",
         exec_engine=ExecEngineConfig(),
-        risk_engine=RiskEngineConfig(bypass=True),  # No risk checks in backtest - revisit before live trading
+        risk_engine=RiskEngineConfig(bypass=True),  # Revisit before live trading
     )
     engine = BacktestEngine(config=engine_config)
 
-    # 3. Adding the IDEALPRO Exchange venue
+    # 3. Venue
     IBKR_VENUE = Venue("IDEALPRO")
     engine.add_venue(
         venue=IBKR_VENUE,
@@ -47,11 +47,11 @@ if __name__ == "__main__":
         account_type=AccountType.MARGIN,
         base_currency=USD,
         starting_balances=[Money(100_000, USD)],
-        fee_model=FixedFeeModel(Money(4.5, USD)),  # Approximates IBKR commission + half the typical EUR/USD spread
-        fill_model=FillModel(prob_slippage=0.3, random_seed=42),  # Illustrative value - tune via sensitivity testing
+        fee_model=FixedFeeModel(Money(4.5, USD)),  # IBKR commission + half the typical spread
+        fill_model=FillModel(prob_slippage=0.3, random_seed=42),  # Illustrative - tune via sensitivity testing
     )
 
-    # 4. Strategy configuration and instantiation
+    # 4. Strategy
     strategy_config = MeanReversionConfig(
         instrument_id=eurusd.id,
         bar_type=eurusd_bar_type,
@@ -59,16 +59,16 @@ if __name__ == "__main__":
     )
     strategy = MeanReversionStrategy(config=strategy_config)
 
-    # 5. Configuring the engine
+    # 5. Wire it together
     engine.add_strategy(strategy)
     engine.add_instrument(eurusd)
     engine.add_data(bars)
 
-    # 6. Running the engine (backtest)
+    # 6. Run
     print("Running backtest...\n")
     engine.run()
 
-    # 7. Generating an HTML Report
+    # 7. HTML report
     report_path = Path(__file__).resolve().parent / "backtest_results.html"
 
     print("Generating an HTML Report...\n")

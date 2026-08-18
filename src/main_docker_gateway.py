@@ -1,7 +1,7 @@
 """Trade through a dockerized IB Gateway that this script starts and stops.
 
-Needs Docker running and TWS_USERNAME / TWS_PASSWORD in .env. For a gateway you
-launched yourself use main.py instead.
+Needs Docker running and credentials in .env.
+For a gateway you launched yourself use main.py.
 """
 
 import os
@@ -36,7 +36,7 @@ def main() -> None:
         username=username,
         password=password,
         trading_mode="paper",
-        read_only_api=False,  # False so the node is allowed to submit orders
+        read_only_api=False,  # Required for the node to submit orders
         timeout=300,
     ))
 
@@ -53,12 +53,12 @@ def main() -> None:
     time.sleep(5)  # The API socket server needs a moment after the login
 
     try:
-        # 2. Hand over to the node - it runs until Ctrl+C
+        # 2. Runs until Ctrl+C
         run_trading_node(config_node)
     except KeyboardInterrupt:
         print("\nInterrupted, shutting down...")
     finally:
-        # 3. Always stop the container, even when the node crashed
+        # 3. Stop the container even when the node crashed
         print("\nStopping IB Gateway container...")
         gateway.stop()
 

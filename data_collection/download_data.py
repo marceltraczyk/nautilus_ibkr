@@ -1,12 +1,6 @@
 """Download 15-minute FX bars from Interactive Brokers into a Parquet catalog.
 
-Run from anywhere - paths are resolved relative to this file:
-
-    .venv/bin/python data_collection/download_data.py
-
-The script is resumable: re-running it skips everything already stored, so a
-run interrupted halfway (or one that hit IB pacing limits) can simply be
-started again to backfill the rest.
+Resumable: re-running skips whatever is already stored.
 """
 
 import asyncio
@@ -34,17 +28,17 @@ from nautilus_trader.persistence.catalog import ParquetDataCatalog
 # --- Configuration ----------------------------------------------------------
 CATALOG_PATH = Path(__file__).parent / "parquet_data"
 
-# FX on IDEALPRO has no trades, so LAST returns nothing - MID is the bid/ask midpoint
+# FX on IDEALPRO has no trades, so LAST returns nothing
 BAR_SPEC = "15-MINUTE-MID"
 
-# Naive datetimes on purpose: request_bars() takes the timezone separately via
-# tz_name, and pandas rejects a tz-aware datetime alongside a tz argument.
+# Naive on purpose: request_bars() takes the timezone separately via tz_name,
+# and pandas rejects a tz-aware datetime alongside a tz argument.
 END_DATE = datetime.datetime.now(datetime.timezone.utc).replace(
     hour=0, minute=0, second=0, microsecond=0, tzinfo=None,
 )
 START_DATE = (pd.Timestamp(END_DATE) - pd.DateOffset(years=10)).to_pydatetime()
 
-# IB derives one request per window; a 10-year window would be rejected outright
+# One IB request per window - a 10-year window would be rejected
 CHUNK = "3MS"
 
 # IB allows 60 historical requests per 10 minutes - 55 leaves headroom
@@ -71,9 +65,8 @@ FX_PAIRS = [
 class PacingLimiter:
     """Keeps the request rate under IB's historical data cap.
 
-    IB counts requests over a sliding ten-minute window, so tracking send times
-    beats a fixed sleep: slow requests consume the wait on their own and only a
-    genuine burst has to pause.
+    IB counts over a sliding window, so tracking send times beats a fixed sleep:
+    slow requests consume the wait on their own.
     """
 
     def __init__(self, max_requests: int, window: float) -> None:
@@ -172,7 +165,7 @@ async def download_pair(client, catalog, limiter, base, quote, chunks, stats):
 
     bar_type = f"{instrument.id}-{BAR_SPEC}-EXTERNAL"
 
-    # Read the resume point once per pair rather than once per window
+    # Read the resume point once per pair, not once per window
     cutoff = stored_cutoff(catalog, bar_type)
     saved = 0
     skipped = 0
@@ -192,8 +185,8 @@ async def download_pair(client, catalog, limiter, base, quote, chunks, stats):
         stats["requests"] += 1
 
         # IB anchors on end_date_time and counts trading days backwards, so it
-        # hands back bars from before chunk_start. Writing those would overlap
-        # the previous file and break the catalog's disjoint-interval invariant.
+        # returns bars from before chunk_start - writing those would overlap
+        # the previous file, which the catalog rejects
         fresh = [bar for bar in bars if bar.ts_init > cutoff]
 
         if fresh:
@@ -270,7 +263,7 @@ async def main() -> None:
 
     try:
         await client.connect()
-        # IB's historical data farm (cashhmds) connects after the socket does
+        # IB's historical data farm connects after the socket does
         await asyncio.sleep(5)
 
         total_requests = len(FX_PAIRS) * len(chunks)
@@ -315,7 +308,6 @@ async def main() -> None:
         print("\nStopping IB Gateway container...\n")
         gateway.stop()
 
-    # Non-zero exit so an unattended run can be told apart from a clean one
     if crashed or stats["failed_pairs"] or stats["failed_chunks"]:
         sys.exit(1)
 

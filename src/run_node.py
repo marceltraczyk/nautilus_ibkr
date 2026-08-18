@@ -23,7 +23,7 @@ def run_trading_node(config_node: TradingNodeConfig) -> None:
     node = TradingNode(config=config_node)
 
     try:
-        # 1. Register the IB client factories, then build the node around them
+        # 1. Register the IB client factories, then build the node
         node.add_data_client_factory(IB, InteractiveBrokersLiveDataClientFactory)
         node.add_exec_client_factory(IB, InteractiveBrokersLiveExecClientFactory)
         node.build()
@@ -36,7 +36,7 @@ def run_trading_node(config_node: TradingNodeConfig) -> None:
         )
         node.trader.add_strategy(MeanReversionStrategy(config=strategy_config))
 
-        # 3. Blocks here, streaming bars and submitting orders, until Ctrl+C
+        # 3. Blocks until Ctrl+C
         node.run()
     finally:
         node.dispose()

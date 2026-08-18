@@ -15,8 +15,8 @@ class MeanReversionConfig(StrategyConfig):
     bar_type: BarType
 
     # Bollinger Bands
-    bb_period: int = 21  # Number of bars for the moving average
-    bb_deviation: float = 2.0  # Standard deviation multiplier
+    bb_period: int = 21
+    bb_deviation: float = 2.0
 
     # Relative Strength Index
     # Nautilus reports RSI on a 0.0-1.0 scale, not the textbook 0-100
@@ -24,16 +24,16 @@ class MeanReversionConfig(StrategyConfig):
     rsi_overbought: float = 0.70
     rsi_oversold: float = 0.30
 
-    # Kaufman Efficiency Ratio
+    # Kaufman Efficiency Ratio - trade only when the market is choppy
     er_period: int = 14
-    max_er: float = 0.30  # Upper threshold: trade only when ER < 0.30
+    max_er: float = 0.30
 
-    # Exit target: the opposite band captures the full swing, the middle band
-    # takes the smaller move back to fair value. Middle wins on 1H - the opposite
-    # band holds through too many failed reversions to pay for the extra distance
+    # The opposite band captures the full swing, the middle band the smaller move
+    # back to fair value. Middle wins on 1H - the opposite band holds through too
+    # many failed reversions to pay for the extra distance.
     exit_at_opposite_band: bool = False
 
-    # Position size (100_000 EUR = 1.0 standard lot)
+    # One standard lot
     trade_size: Quantity = Quantity.from_int(100_000)
 
 
@@ -45,8 +45,6 @@ class MeanReversionStrategy(Strategy):
         self.rsi = RelativeStrengthIndex(period=config.rsi_period)
         self.er = EfficiencyRatio(period=config.er_period)
 
-        # Bars needed before every indicator reports a value, tracked so the
-        # warm-up can report progress instead of sitting silent
         self.warmup_target = max(config.bb_period, config.rsi_period, config.er_period)
         self.bars_seen = 0
 
@@ -54,12 +52,10 @@ class MeanReversionStrategy(Strategy):
         self.log.info("Starting Mean Reversion strategy (Bollinger + RSI + EfficiencyRatio)!")
         self.subscribe_bars(self.config.bar_type)
 
-        # Register indicators with the execution engine
         self.register_indicator_for_bars(self.config.bar_type, self.bands)
         self.register_indicator_for_bars(self.config.bar_type, self.rsi)
         self.register_indicator_for_bars(self.config.bar_type, self.er)
 
-        # Retrieve cached historical bars from engine memory
         cached_bars = self.cache.bars(self.config.bar_type)
 
         if cached_bars:
@@ -85,8 +81,7 @@ class MeanReversionStrategy(Strategy):
     def on_bar(self, bar: Bar) -> None:
         self.bars_seen += 1
 
-        # 1. Guard clause: wait for the indicators to warm up, reporting progress
-        # so the strategy is visibly alive during the silent stretch
+        # 1. Wait for the indicators to warm up, reporting progress meanwhile
         if not (self.bands.initialized and self.rsi.initialized and self.er.initialized):
             self.log.info(
                 f"Warming up: {self.bars_seen}/{self.warmup_target} bars | close {bar.close}"
@@ -105,7 +100,7 @@ class MeanReversionStrategy(Strategy):
         is_short = self.portfolio.is_net_short(self.config.instrument_id)
         is_flat = not is_long and not is_short
 
-        # 2. One line per bar showing where price sits against every threshold
+        # 2. One line per bar showing price against every threshold
         position = "LONG" if is_long else "SHORT" if is_short else "FLAT"
         self.log.info(
             f"[{position}] close {close_price:.5f} | "
@@ -131,18 +126,16 @@ class MeanReversionStrategy(Strategy):
 
         # 4. Entry logic
         if is_flat:
-            # Trend filter: ignore entries when market efficiency is too high (ER >= 0.30)
+            # Skip entries when the market is trending too cleanly
             if er_val >= self.config.max_er:
                 return
 
-            # BUY signal: Price below lower band + RSI oversold
             if close_price < lower_band and rsi_val < self.config.rsi_oversold:
                 self.log.info(
                     f"BUY signal! Close: {close_price:.5f} < Lower: {lower_band:.5f} | RSI: {rsi_val:.2f} | ER: {er_val:.2f}"
                 )
                 self._submit_market_order(OrderSide.BUY)
 
-            # SELL signal: Price above upper band + RSI overbought
             elif close_price > upper_band and rsi_val > self.config.rsi_overbought:
                 self.log.info(
                     f"SELL signal! Close: {close_price:.5f} > Upper: {upper_band:.5f} | RSI: {rsi_val:.2f} | ER: {er_val:.2f}"

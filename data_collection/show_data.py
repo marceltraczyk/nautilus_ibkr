@@ -1,10 +1,7 @@
 """Show what is stored in the Parquet catalog written by download_data.py.
 
-    .venv/bin/python data_collection/show_data.py           # summary of every bar type
-    .venv/bin/python data_collection/show_data.py EURUSD    # file-by-file detail + gaps
-
-Reads only the ts_init column and file metadata, so it stays fast even once the
-catalog holds millions of bars.
+    show_data.py           # summary of every bar type
+    show_data.py EURUSD    # file-by-file detail + gaps
 """
 
 import sys
@@ -18,7 +15,7 @@ CATALOG_PATH = Path(__file__).parent / "parquet_data"
 
 BARS_PER_DAY = 96  # 24h of 15-minute bars
 GAPS_TO_SHOW = 10
-WEEKEND_HOURS = 47.0  # A normal FX weekend gap - anything near this is expected
+WEEKEND_HOURS = 47.0  # A normal FX weekend close
 
 
 def human_size(num_bytes: float) -> str:
@@ -80,8 +77,7 @@ def summarise(catalog_path: Path) -> None:
 
         first, last = stamps[0], stamps[-1]
 
-        # Rough expectation: every weekday carries a full 24h of 15-minute bars.
-        # Holidays are not excluded, so a healthy catalog lands a little under 100%.
+        # Holidays are not excluded, so a healthy catalog lands just under 100%
         weekdays = len(pd.bdate_range(first.date(), last.date()))
         cover = bars / (weekdays * BARS_PER_DAY) * 100 if weekdays else 0.0
 
@@ -125,7 +121,7 @@ def detail(catalog_path: Path, needle: str) -> None:
         deltas = stamps.to_series().diff().dropna()
         gaps = deltas[deltas > pd.Timedelta(hours=1)]
 
-        # A weekly close is expected; anything else is a hole worth knowing about
+        # A weekly close is expected, anything else is a real hole
         hours = gaps.dt.total_seconds() / 3600
         weekends = gaps[(hours - WEEKEND_HOURS).abs() < 4]
         holes = gaps.drop(weekends.index).sort_values(ascending=False)

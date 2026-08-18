@@ -21,27 +21,22 @@ load_dotenv()
 # --- What to trade ----------------------------------------------------------
 INSTRUMENT_ID = "EUR/USD.IDEALPRO"
 
-# 1-MINUTE keeps the demo responsive. The strategy needs `bb_period` bars before
-# it can emit a signal, so 15-MINUTE would mean waiting over five hours for the
-# first one. Switch to 15-MINUTE to match the timeframe used in the backtest.
+# The strategy needs `bb_period` bars before its first signal, so 1-MINUTE keeps
+# the demo responsive. Use 15-MINUTE to match the backtest.
 BAR_TYPE = f"{INSTRUMENT_ID}-1-MINUTE-MID-EXTERNAL"
 
-# 100_000 EUR is one standard lot
+# One standard lot
 TRADE_SIZE = 100_000
 
-# Both entry points reach the gateway at the same address: the dockerized
-# gateway publishes 4002 on localhost, and a desktop IB Gateway in paper mode
-# listens there as well. Override in .env when yours differs.
+# Both the dockerized and the desktop gateway listen here in paper mode
 IB_HOST = os.environ.get("IB_HOST", "127.0.0.1")
 IB_PORT = int(os.environ.get("IB_PORT", "4002"))
 
-# Instrument provider configuration
 instrument_provider_config = InteractiveBrokersInstrumentProviderConfig(
     symbology_method=SymbologyMethod.IB_SIMPLIFIED,
     load_ids=frozenset([INSTRUMENT_ID]),
 )
 
-# Data client configuration
 data_client_config = InteractiveBrokersDataClientConfig(
     ibg_host=IB_HOST,
     ibg_port=IB_PORT,
@@ -51,7 +46,7 @@ data_client_config = InteractiveBrokersDataClientConfig(
     instrument_provider=instrument_provider_config,
 )
 
-# Execution client configuration - a separate client id, IB requires one per connection
+# Separate client id - IB requires one per connection
 exec_client_config = InteractiveBrokersExecClientConfig(
     ibg_host=IB_HOST,
     ibg_port=IB_PORT,
@@ -61,7 +56,6 @@ exec_client_config = InteractiveBrokersExecClientConfig(
     routing=RoutingConfig(default=True),
 )
 
-# Trading node configuration
 config_node = TradingNodeConfig(
     trader_id="PAPER-TRADER-001",
     logging=LoggingConfig(log_level="INFO"),

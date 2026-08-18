@@ -1,7 +1,7 @@
-"""Trade through an IB Gateway you started yourself on this machine.
+"""Trade through an IB Gateway you start yourself.
 
-Launch IB Gateway (or TWS), log into the paper account and enable the API socket,
-then run this file. For the dockerized gateway use main_docker_gateway.py.
+Log into the paper account and enable the API socket first.
+For the dockerized gateway use main_docker_gateway.py.
 """
 
 import sys
@@ -16,7 +16,7 @@ from src.run_node import run_trading_node
 def main() -> None:
     print("Connecting to IB Gateway...\n")
 
-    # 1. Hand over to the node - it runs until Ctrl+C
+    # 1. Runs until Ctrl+C
     try:
         run_trading_node(config_node)
     except KeyboardInterrupt:
