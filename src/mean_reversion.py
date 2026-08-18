@@ -45,6 +45,11 @@ class MeanReversionStrategy(Strategy):
         self.rsi = RelativeStrengthIndex(period=config.rsi_period)
         self.er = EfficiencyRatio(period=config.er_period)
 
+        # Bars needed before every indicator reports a value, tracked so the
+        # warm-up can report progress instead of sitting silent
+        self.warmup_target = max(config.bb_period, config.rsi_period, config.er_period)
+        self.bars_seen = 0
+
     def on_start(self) -> None:
         self.log.info("Starting Mean Reversion strategy (Bollinger + RSI + EfficiencyRatio)!")
         self.subscribe_bars(self.config.bar_type)
@@ -63,20 +68,29 @@ class MeanReversionStrategy(Strategy):
                 self.config.rsi_period,
                 self.config.er_period,
             )
-            bars_to_warmup = list(cached_bars)[-warmup_length:]
+            # The cache returns bars newest first, so take the newest `warmup_length`
+            # and flip them back into chronological order before feeding indicators
+            bars_to_warmup = list(cached_bars)[:warmup_length][::-1]
             for bar in bars_to_warmup:
                 self.bands.handle_bar(bar)
                 self.rsi.handle_bar(bar)
                 self.er.handle_bar(bar)
 
+            self.bars_seen = len(bars_to_warmup)
             self.log.info(
                 f"Warmed up indicators with {len(bars_to_warmup)} cached bars. "
                 f"Bands initialized: {self.bands.initialized}"
             )
 
     def on_bar(self, bar: Bar) -> None:
-        # 1. Guard clause: Wait for all indicators to warm up
+        self.bars_seen += 1
+
+        # 1. Guard clause: wait for the indicators to warm up, reporting progress
+        # so the strategy is visibly alive during the silent stretch
         if not (self.bands.initialized and self.rsi.initialized and self.er.initialized):
+            self.log.info(
+                f"Warming up: {self.bars_seen}/{self.warmup_target} bars | close {bar.close}"
+            )
             return
 
         close_price = float(bar.close)
@@ -91,7 +105,17 @@ class MeanReversionStrategy(Strategy):
         is_short = self.portfolio.is_net_short(self.config.instrument_id)
         is_flat = not is_long and not is_short
 
-        # 2. Exit logic
+        # 2. One line per bar showing where price sits against every threshold
+        position = "LONG" if is_long else "SHORT" if is_short else "FLAT"
+        self.log.info(
+            f"[{position}] close {close_price:.5f} | "
+            f"bands {lower_band:.5f} / {middle_band:.5f} / {upper_band:.5f} | "
+            f"RSI {rsi_val:.2f} (buy <{self.config.rsi_oversold:.2f}, "
+            f"sell >{self.config.rsi_overbought:.2f}) | "
+            f"ER {er_val:.2f} (trade <{self.config.max_er:.2f})"
+        )
+
+        # 3. Exit logic
         long_target = upper_band if self.config.exit_at_opposite_band else middle_band
         short_target = lower_band if self.config.exit_at_opposite_band else middle_band
 
@@ -105,7 +129,7 @@ class MeanReversionStrategy(Strategy):
             self.close_all_positions(self.config.instrument_id)
             return
 
-        # 3. Entry logic
+        # 4. Entry logic
         if is_flat:
             # Trend filter: ignore entries when market efficiency is too high (ER >= 0.30)
             if er_val >= self.config.max_er:
